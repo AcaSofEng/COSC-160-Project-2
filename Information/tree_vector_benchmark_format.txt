@@ -1,0 +1,9 @@
+Below are the steps for running the tree_vector_benchmark program
+
+Step 1: Run the tree_vector_benchmark binary/executable
+
+Step 2: Once the tree_vector_benchmark program starts, the user will be promted to enter a number
+	The number will become the number of elements to benchmark
+	If something other than a number is entered, the program will output that a number is not entered and the program will reprompt the user to enter a number
+
+Step 3: Once the desired number is entered, tree_vector<std::uintmax_t> will be benchmarked against std::vector<std::uintmax_t> using the number entered for some of the benchmarks
