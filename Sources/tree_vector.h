@@ -52,7 +52,6 @@ class tree_vector
                                                         _right_child(){}
     };
 
-    template<typename iterator_value_type>
     class tree_node_iterator
     {
         tree_node* _tree_node;
@@ -126,7 +125,6 @@ class tree_vector
             tree_node_iterator operator++(int)
             {
                 tree_node_iterator previous_iterator(_tree_node);
-
                 _tree_node=successor_node(_tree_node);
 
                 return previous_iterator;
@@ -135,18 +133,17 @@ class tree_vector
             tree_node_iterator operator--(int)
             {
                 tree_node_iterator next_iterator(_tree_node);
-
                 _tree_node=predecessor_node(_tree_node);
 
                 return next_iterator;
             }
 
-            iterator_value_type& operator*() const
+            value_type& operator*() const
             {
                 return _tree_node->_value;
             }
 
-            iterator_value_type* operator->() const
+            value_type* operator->() const
             {
                 return std::addressof(_tree_node->_value);
             }
@@ -162,10 +159,9 @@ class tree_vector
             }
     };
 
-    template<typename iterator_value_type>
     class tree_node_reverse_iterator
     {
-        tree_node_iterator<iterator_value_type> _tree_node_iterator;
+        tree_node_iterator _tree_node_iterator;
 
         public:
             tree_node_reverse_iterator():_tree_node_iterator(){}
@@ -188,7 +184,6 @@ class tree_vector
             tree_node_reverse_iterator operator++(int)
             {
                 tree_node_reverse_iterator next_iterator(*this);
-
                 --_tree_node_iterator;
 
                 return next_iterator;
@@ -197,18 +192,17 @@ class tree_vector
             tree_node_reverse_iterator operator--(int)
             {
                 tree_node_reverse_iterator previous_iterator(*this);
-
                 ++_tree_node_iterator;
 
                 return previous_iterator;
             }
 
-            iterator_value_type& operator*() const
+            value_type& operator*() const
             {
                 return *_tree_node_iterator;
             }
 
-            iterator_value_type* operator->() const
+            value_type* operator->() const
             {
                 return _tree_node_iterator.operator->();
             }
@@ -221,6 +215,172 @@ class tree_vector
             bool operator!=(const tree_node_reverse_iterator& source_iterator) const
             {
                 return _tree_node_iterator!=source_iterator._tree_node_iterator;
+            }
+    };
+
+    class tree_node_const_iterator
+    {
+        const tree_node* _tree_node;
+
+        const tree_node* predecessor_node(const tree_node* source_node)
+        {
+            if(source_node->_left_child)
+            {
+                source_node=source_node->_left_child;
+                while(source_node->_right_child)
+                {
+                    source_node=source_node->_right_child;
+                }
+
+                return source_node;
+            }
+
+            const tree_node* source_node_parent(source_node->_parent);
+            while(source_node_parent
+                  &&source_node_parent->_left_child==source_node)
+            {
+                source_node=source_node_parent;
+                source_node_parent=source_node_parent->_parent;
+            }
+
+            return source_node_parent;
+        }
+
+        const tree_node* successor_node(const tree_node* source_node)
+        {
+            if(source_node->_right_child)
+            {
+                source_node=source_node->_right_child;
+                while(source_node->_left_child)
+                {
+                    source_node=source_node->_left_child;
+                }
+
+                return source_node;
+            }
+
+            const tree_node* source_node_parent(source_node->_parent);
+            while(source_node_parent
+                  &&source_node_parent->_right_child==source_node)
+            {
+                source_node=source_node_parent;
+                source_node_parent=source_node_parent->_parent;
+            }
+
+            return source_node_parent;
+        }
+
+        public:
+            tree_node_const_iterator():_tree_node(){}
+            tree_node_const_iterator(const tree_node* const source_node):_tree_node(source_node){}
+
+            tree_node_const_iterator& operator++()
+            {
+                _tree_node=successor_node(_tree_node);
+
+                return *this;
+            }
+
+            tree_node_const_iterator& operator--()
+            {
+                _tree_node=predecessor_node(_tree_node);
+
+                return *this;
+            }
+
+            tree_node_const_iterator operator++(int)
+            {
+                tree_node_const_iterator previous_iterator(_tree_node);
+                _tree_node=successor_node(_tree_node);
+
+                return previous_iterator;
+            }
+
+            tree_node_const_iterator operator--(int)
+            {
+                tree_node_const_iterator next_iterator(_tree_node);
+                _tree_node=predecessor_node(_tree_node);
+
+                return next_iterator;
+            }
+
+            const value_type& operator*() const
+            {
+                return _tree_node->_value;
+            }
+
+            const value_type* operator->() const
+            {
+                return std::addressof(_tree_node->_value);
+            }
+
+            bool operator==(const tree_node_const_iterator& source_iterator) const
+            {
+                return _tree_node==source_iterator._tree_node;
+            }
+
+            bool operator!=(const tree_node_const_iterator& source_iterator) const
+            {
+                return _tree_node!=source_iterator._tree_node;
+            }
+    };
+
+    class tree_node_const_reverse_iterator
+    {
+        tree_node_const_iterator _tree_node_const_iterator;
+
+        public:
+            tree_node_const_reverse_iterator():_tree_node_const_iterator(){}
+            tree_node_const_reverse_iterator(const tree_node* const source_node):_tree_node_const_iterator(source_node){}
+
+            tree_node_const_reverse_iterator& operator++()
+            {
+                --_tree_node_const_iterator;
+
+                return *this;
+            }
+
+            tree_node_const_reverse_iterator& operator--()
+            {
+                ++_tree_node_const_iterator;
+
+                return *this;
+            }
+
+            tree_node_const_reverse_iterator operator++(int)
+            {
+                tree_node_const_reverse_iterator next_iterator(*this);
+                --_tree_node_const_iterator;
+
+                return next_iterator;
+            }
+
+            tree_node_const_reverse_iterator operator--(int)
+            {
+                tree_node_const_reverse_iterator previous_iterator(*this);
+                ++_tree_node_const_iterator;
+
+                return previous_iterator;
+            }
+
+            const value_type& operator*() const
+            {
+                return *_tree_node_const_iterator;
+            }
+
+            const value_type* operator->() const
+            {
+                return _tree_node_const_iterator.operator->();
+            }
+
+            bool operator==(const tree_node_const_reverse_iterator& source_iterator) const
+            {
+                return _tree_node_const_iterator==source_iterator._tree_node_const_iterator;
+            }
+
+            bool operator!=(const tree_node_const_reverse_iterator& source_iterator) const
+            {
+                return _tree_node_const_iterator!=source_iterator._tree_node_const_iterator;
             }
     };
 
@@ -324,6 +484,96 @@ class tree_vector
         return copy_root;
     }
 
+    void assign_tree(const tree_node* source_root)
+    {
+        if(!source_root)
+        {
+            clear_tree();
+            _root=nullptr;
+            _auxiliary._left_child=nullptr;
+            _auxiliary._right_child=nullptr;
+        }
+
+        tree_node* traverse_node(_root);
+        while(source_root)
+        {
+            while(source_root->_left_child)
+            {
+                traverse_node->_value=source_root->_value;
+                source_root=source_root->_left_child;
+                if(!traverse_node->_left_child)
+                {
+                    traverse_node->_left_child=copy_node(source_root,
+                                                         traverse_node);
+                }
+
+                traverse_node=traverse_node->_left_child;
+                if(traverse_node->_parent==_auxiliary._left_child)
+                {
+                    _auxiliary._left_child=traverse_node;
+                }
+            }
+
+            if(source_root->_right_child)
+            {
+                traverse_node->_value=source_root->_value;
+                source_root=source_root->_right_child;
+                if(!traverse_node->_right_child)
+                {
+                    traverse_node->_right_child=copy_node(source_root,
+                                                          traverse_node);
+                }
+
+                traverse_node=traverse_node->_right_child;
+                if(traverse_node->_parent==_auxiliary._right_child)
+                {
+                    _auxiliary._right_child=traverse_node;
+                }
+            }
+
+            else
+            {
+                while(source_root->_parent
+                      &&source_root->_parent->_right_child==source_root)
+                {
+                    source_root=source_root->_parent;
+                    traverse_node=traverse_node->_parent;
+                }
+
+                while(source_root->_parent
+                      &&!source_root->_parent->_right_child)
+                {
+                    source_root=source_root->_parent;
+                    traverse_node=traverse_node->_parent;
+                }
+
+                if(source_root->_parent)
+                {
+                    traverse_node->_value=source_root->_value;
+                    source_root=source_root->_parent->_right_child;
+                    traverse_node=traverse_node->_parent;
+                    if(!traverse_node->_right_child)
+                    {
+                        traverse_node->_right_child=copy_node(source_root,
+                                                              traverse_node);
+                    }
+
+                    traverse_node=traverse_node->_right_child;
+                    traverse_node->_value=source_root->_value;
+                    if(traverse_node->_parent==_auxiliary._right_child)
+                    {
+                        _auxiliary._right_child=traverse_node;
+                    }
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }
+
     void copy_values(const std::size_t source_value_count,
                      const value_type& source_value)
     {
@@ -335,7 +585,7 @@ class tree_vector
         }
     }
 
-    void copy_values(const std::initializer_list<value_type> source_initializer_list)
+    void copy_values(const std::initializer_list<const value_type>& source_initializer_list)
     {
         for(const value_type& source_value:source_initializer_list)
         {
@@ -393,15 +643,6 @@ class tree_vector
         }
     }
 
-    void reset()
-    {
-        _tree_node_allocator=allocator_type<tree_node>();
-        _auxiliary._left_child=nullptr;
-        _auxiliary._right_child=nullptr;
-        _root=nullptr;
-        _size=std::size_t();
-    }
-
     void transfer_node(const tree_node* const source_node,
                        tree_node* const source_node_parent,
                        tree_node* const source_transfer_node)
@@ -416,7 +657,7 @@ class tree_vector
             source_node_parent->_left_child=source_transfer_node;
         }
 
-        else
+        else if(source_node_parent->_right_child==source_node)
         {
             source_node_parent->_right_child=source_transfer_node;
         }
@@ -428,12 +669,12 @@ class tree_vector
     }
 
     template<typename... argument_types>
-    tree_node_iterator<value_type> forward_insert(const std::size_t source_index,
-                                                  argument_types&&... source_arguments)
+    tree_node_iterator forward_insert(const std::size_t source_index,
+                                      argument_types&&... source_arguments)
     {
         if(source_index>_size)
         {
-            return tree_node_iterator<value_type>();
+            return tree_node_iterator();
         }
 
         tree_node* insert_node_parent{};
@@ -477,7 +718,6 @@ class tree_vector
         else if(left_child_insert)
         {
             insert_node_parent->_left_child=insert_node;
-
             if(insert_node_parent==_auxiliary._left_child)
             {
                 _auxiliary._left_child=insert_node;
@@ -487,7 +727,6 @@ class tree_vector
         else
         {
             insert_node_parent->_right_child=insert_node;
-
             if(insert_node_parent==_auxiliary._right_child)
             {
                 _auxiliary._right_child=insert_node;
@@ -498,18 +737,17 @@ class tree_vector
 
         rebalance_tree(insert_node);
 
-        return tree_node_iterator<value_type>(insert_node);
+        return tree_node_iterator(insert_node);
     }
 
-    template<typename tree_node_type>
-    tree_node_type find(const std::size_t source_index) const
+    tree_node* find(const std::size_t source_index)
     {
         if(source_index>=_size)
         {
-            return tree_node_type();
+            return nullptr;
         }
 
-        tree_node_type find_node(_root);
+        tree_node* find_node(_root);
         std::size_t traverse_index{};
         std::size_t tree_node_index{};
         while(find_node)
@@ -537,8 +775,43 @@ class tree_vector
         return find_node;
     }
 
-    void update_auxiliary(const tree_node* const source_node,
-                          tree_node* const source_node_parent)
+    const tree_node* find(const std::size_t source_index) const
+    {
+        if(source_index>=_size)
+        {
+            return nullptr;
+        }
+
+        const tree_node* find_node(_root);
+        std::size_t traverse_index{};
+        std::size_t tree_node_index{};
+        while(find_node)
+        {
+            tree_node_index=traverse_index
+                            +find_node->_left_subtree_size;
+            if(tree_node_index>source_index)
+            {
+                find_node=find_node->_left_child;
+            }
+
+            else if(tree_node_index<source_index)
+            {
+                traverse_index=tree_node_index
+                               +static_cast<std::size_t>(1);
+                find_node=find_node->_right_child;
+            }
+
+            else
+            {
+                break;
+            }
+        }
+
+        return find_node;
+    }
+
+    void transfer_auxiliary(const tree_node* const source_node,
+                            tree_node* const source_node_parent)
     {
         if(source_node==_auxiliary._left_child)
         {
@@ -611,7 +884,6 @@ class tree_vector
         rotate_node->_left_subtree_size=source_node->_left_subtree_size
                                         +rotate_node->_left_subtree_size
                                         +static_cast<std::size_t>(1);
-
         calculate_height(rotate_node);
 
         return rotate_node;
@@ -633,12 +905,10 @@ class tree_vector
         source_node->_left_subtree_size=source_node->_left_subtree_size
                                         -rotate_node->_left_subtree_size
                                         -static_cast<std::size_t>(1);
-
         calculate_height(source_node);
 
         rotate_node->_right_child=source_node;
         rotate_node->_right_child->_parent=rotate_node;
-
         calculate_height(rotate_node);
 
         return rotate_node;
@@ -697,30 +967,27 @@ class tree_vector
     }
 
     public:
-        using const_iterator=tree_node_iterator<const value_type>;
-        using const_reverse_iterator=tree_node_reverse_iterator<const value_type>;
-        using iterator=tree_node_iterator<value_type>;
-        using reverse_iterator=tree_node_reverse_iterator<value_type>;
+        using const_iterator=tree_node_const_iterator;
+        using const_reverse_iterator=tree_node_const_reverse_iterator;
+        using iterator=tree_node_iterator;
+        using reverse_iterator=tree_node_reverse_iterator;
 
         tree_vector():_tree_node_allocator(),
                       _auxiliary(),
                       _root(),
                       _size(){}
 
-        tree_vector(const tree_vector& source_vector):_tree_node_allocator(source_vector._tree_node_allocator),
-                                                      _auxiliary(),
-                                                      _root(copy_tree(source_vector._root)),
-                                                      _size(source_vector._size){}
+        tree_vector(const tree_vector& source_tree_vector):_tree_node_allocator(source_tree_vector._tree_node_allocator),
+                                                           _auxiliary(),
+                                                           _root(copy_tree(source_tree_vector._root)),
+                                                           _size(source_tree_vector._size){}
 
-        tree_vector(tree_vector&& source_vector):_tree_node_allocator(std::move(source_vector._tree_node_allocator)),
-                                                 _auxiliary(source_vector._auxiliary),
-                                                 _root(source_vector._root),
-                                                 _size(source_vector._size)
+        tree_vector(tree_vector&& source_tree_vector):tree_vector()
         {
-            source_vector.reset();
+            swap(source_tree_vector);
         }
 
-        tree_vector(const std::initializer_list<value_type> source_initializer_list):tree_vector()
+        tree_vector(const std::initializer_list<const value_type>& source_initializer_list):tree_vector()
         {
             copy_values(source_initializer_list);
         }
@@ -750,32 +1017,32 @@ class tree_vector
             clear_tree();
         }
 
-        tree_vector& operator=(const tree_vector& source_vector)
+        tree_vector& operator=(const tree_vector& source_tree_vector)
         {
-            clear();
+            _tree_node_allocator=source_tree_vector._tree_node_allocator;
+            _size=source_tree_vector._size;
 
-            _tree_node_allocator=source_vector._tree_node_allocator;
-            _root=copy_tree(source_vector._root);
-            _size=source_vector._size;
+            if(!_root)
+            {
+                _root=copy_tree(source_tree_vector._root);
+            }
+
+            else
+            {
+                assign_tree(source_tree_vector._root);
+            }
 
             return *this;
         }
 
-        tree_vector& operator=(tree_vector&& source_vector)
+        tree_vector& operator=(tree_vector&& source_tree_vector)
         {
-            clear();
-
-            _tree_node_allocator=std::move(source_vector._tree_node_allocator);
-            _auxiliary=source_vector._auxiliary;
-            _root=source_vector._root;
-            _size=source_vector._size;
-
-            source_vector.reset();
+            swap(source_tree_vector);
 
             return *this;
         }
 
-        tree_vector& operator=(const std::initializer_list<value_type> source_initializer_list)
+        tree_vector& operator=(const std::initializer_list<const value_type> source_initializer_list)
         {
             clear();
             copy_values(source_initializer_list);
@@ -802,12 +1069,12 @@ class tree_vector
                         source_end_iterator);
         }
 
-        bool operator<(const tree_vector& source_vector) const
+        bool operator<(const tree_vector& source_tree_vector) const
         {
             for(const_iterator begin_iterator(cbegin()),
-                source_begin_iterator(source_vector.cbegin());
+                source_begin_iterator(source_tree_vector.cbegin());
                 begin_iterator!=cend()
-                &&source_begin_iterator!=source_vector.cend();
+                &&source_begin_iterator!=source_tree_vector.cend();
                 ++begin_iterator,
                 ++source_begin_iterator)
             {
@@ -817,33 +1084,33 @@ class tree_vector
                 }
             }
 
-            return _size<source_vector._size;
+            return _size<source_tree_vector._size;
         }
 
-        bool operator>(const tree_vector& source_vector) const
+        bool operator>(const tree_vector& source_tree_vector) const
         {
-            return source_vector<(*this);
+            return source_tree_vector<(*this);
         }
 
-        bool operator<=(const tree_vector& source_vector) const
+        bool operator<=(const tree_vector& source_tree_vector) const
         {
-            return !((*this)>source_vector);
+            return !((*this)>source_tree_vector);
         }
 
-        bool operator>=(const tree_vector& source_vector) const
+        bool operator>=(const tree_vector& source_tree_vector) const
         {
-            return !((*this)<source_vector);
+            return !((*this)<source_tree_vector);
         }
 
-        bool operator==(const tree_vector& source_vector) const
+        bool operator==(const tree_vector& source_tree_vector) const
         {
-            if(_size!=source_vector._size)
+            if(_size!=source_tree_vector._size)
             {
                 return false;
             }
 
             for(const_iterator begin_iterator(cbegin()),
-                source_begin_iterator(source_vector.cbegin());
+                source_begin_iterator(source_tree_vector.cbegin());
                 begin_iterator!=cend();
                 ++begin_iterator,
                 ++source_begin_iterator)
@@ -857,9 +1124,9 @@ class tree_vector
             return true;
         }
 
-        bool operator!=(const tree_vector& source_vector) const
+        bool operator!=(const tree_vector& source_tree_vector) const
         {
-            return !((*this)==source_vector);
+            return !((*this)==source_tree_vector);
         }
 
         template<typename forward_value_type>
@@ -893,9 +1160,9 @@ class tree_vector
         }
 
         iterator insert(const std::size_t source_index,
-                        const std::initializer_list<value_type> source_initializer_list)
+                        const std::initializer_list<const value_type> source_initializer_list)
         {
-            typename std::initializer_list<value_type>::iterator source_begin_iterator(source_initializer_list.begin());
+            typename std::initializer_list<const value_type>::iterator source_begin_iterator(source_initializer_list.begin());
             if(source_begin_iterator==source_initializer_list.end())
             {
                 return end();
@@ -977,12 +1244,12 @@ class tree_vector
 
         const value_type& operator[](const std::size_t source_index) const
         {
-            return find<const tree_node*>(source_index)->_value;
+            return find(source_index)->_value;
         }
 
         value_type& operator[](const std::size_t source_index)
         {
-            return find<tree_node*>(source_index)->_value;
+            return find(source_index)->_value;
         }
 
         const value_type& at(const std::size_t source_index) const
@@ -992,7 +1259,7 @@ class tree_vector
                 throw std::out_of_range("tree_vector::at() const");
             }
 
-            return find<const tree_node*>(source_index)->_value;
+            return find(source_index)->_value;
         }
 
         value_type& at(const std::size_t source_index)
@@ -1002,7 +1269,7 @@ class tree_vector
                 throw std::out_of_range("tree_vector::at()");
             }
 
-            return find<tree_node*>(source_index)->_value;
+            return find(source_index)->_value;
         }
 
         bool contains(const std::size_t source_index) const
@@ -1026,8 +1293,7 @@ class tree_vector
             tree_node* erase_node_parent{};
             tree_node* erase_node(_root);
             std::size_t traverse_index{};
-            std::size_t tree_node_index(traverse_index
-                                        +erase_node->_left_subtree_size);
+            std::size_t tree_node_index(erase_node->_left_subtree_size);
             while(tree_node_index!=source_index)
             {
                 erase_node_parent=erase_node;
@@ -1056,28 +1322,26 @@ class tree_vector
             {
                 rebalance_node=erase_node->_right_child
                                ?erase_node->_right_child
-                               :erase_node->_parent;
+                               :erase_node_parent;
 
                 transfer_node(erase_node,
                               erase_node_parent,
                               erase_node->_right_child);
-
-                update_auxiliary(erase_node,
-                                 erase_node_parent);
+                transfer_auxiliary(erase_node,
+                                   erase_node_parent);
             }
 
             else if(!erase_node->_right_child)
             {
                 rebalance_node=erase_node->_left_child
                                ?erase_node->_left_child
-                               :erase_node->_parent;
+                               :erase_node_parent;
 
                 transfer_node(erase_node,
                               erase_node_parent,
                               erase_node->_left_child);
-
-                update_auxiliary(erase_node,
-                                 erase_node_parent);
+                transfer_auxiliary(erase_node,
+                                   erase_node_parent);
             }
 
             else
@@ -1153,7 +1417,11 @@ class tree_vector
         void clear()
         {
             clear_tree();
-            reset();
+            _tree_node_allocator=allocator_type<tree_node>();
+            _auxiliary._left_child=nullptr;
+            _auxiliary._right_child=nullptr;
+            _root=nullptr;
+            _size=std::size_t();
         }
 
         std::size_t size() const
@@ -1247,11 +1515,16 @@ class tree_vector
             return reverse_iterator();
         }
 
-        void swap(tree_vector& source_vector)
+        void swap(tree_vector& source_tree_vector)
         {
-            tree_vector swap_vector(std::move(*this));
-            *this=std::move(source_vector);
-            source_vector=std::move(swap_vector);
+            std::swap(_tree_node_allocator,
+                      source_tree_vector._tree_node_allocator);
+            std::swap(_auxiliary,
+                      source_tree_vector._auxiliary);
+            std::swap(_root,
+                      source_tree_vector._root);
+            std::swap(_size,
+                      source_tree_vector._size);
         }
 };
 

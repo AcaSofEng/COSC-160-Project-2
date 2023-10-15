@@ -468,8 +468,8 @@ void bracket_find_benchmark(const std::uintmax_t source_value_count)
         index<system_vector.size();
         ++index)
     {
-        system_vector[index]=static_cast<std::uintmax_t>(index)
-                             *static_cast<std::uintmax_t>(2);
+        system_vector[index]=(static_cast<std::uintmax_t>(index)
+                              <<static_cast<std::uintmax_t>(1));
     }
 
     std::chrono::steady_clock::time_point end_time_point(std::chrono::steady_clock::now());
@@ -491,8 +491,8 @@ void bracket_find_benchmark(const std::uintmax_t source_value_count)
         index<system_tree_vector.size();
         ++index)
     {
-        system_tree_vector[index]=static_cast<std::uintmax_t>(index)
-                                  *static_cast<std::uintmax_t>(2);
+        system_tree_vector[index]=(static_cast<std::uintmax_t>(index)
+                                   <<static_cast<std::uintmax_t>(1));
     }
 
     end_time_point=std::chrono::steady_clock::now();
@@ -519,8 +519,8 @@ void at_find_benchmark(const std::uintmax_t source_value_count)
         index<system_vector.size();
         ++index)
     {
-        system_vector.at(index)=static_cast<std::uintmax_t>(index)
-                                *static_cast<std::uintmax_t>(2);
+        system_vector.at(index)=(static_cast<std::uintmax_t>(index)
+                                 <<static_cast<std::uintmax_t>(1));
     }
 
     std::chrono::steady_clock::time_point end_time_point(std::chrono::steady_clock::now());
@@ -542,8 +542,8 @@ void at_find_benchmark(const std::uintmax_t source_value_count)
         index<system_tree_vector.size();
         ++index)
     {
-        system_tree_vector.at(index)=static_cast<std::uintmax_t>(index)
-                                     *static_cast<std::uintmax_t>(2);
+        system_tree_vector.at(index)=(static_cast<std::uintmax_t>(index)
+                                      <<static_cast<std::uintmax_t>(1));
     }
 
     end_time_point=std::chrono::steady_clock::now();
@@ -568,7 +568,7 @@ void iterator_traverse_benchmark(const std::uintmax_t source_value_count)
 
     for(std::uintmax_t& system_value:system_vector)
     {
-        system_value*=static_cast<std::uintmax_t>(2);
+        system_value<<=static_cast<std::uintmax_t>(1);
     }
 
     std::chrono::steady_clock::time_point end_time_point(std::chrono::steady_clock::now());
@@ -588,7 +588,7 @@ void iterator_traverse_benchmark(const std::uintmax_t source_value_count)
 
     for(std::uintmax_t& system_value:system_tree_vector)
     {
-        system_value*=static_cast<std::uintmax_t>(2);
+        system_value<<=static_cast<std::uintmax_t>(1);
     }
 
     end_time_point=std::chrono::steady_clock::now();
@@ -615,7 +615,7 @@ void reverse_iterator_traverse_benchmark(const std::uintmax_t source_value_count
         iterator!=system_vector.rend();
         ++iterator)
     {
-        (*iterator)*=static_cast<std::uintmax_t>(2);
+        (*iterator)<<=static_cast<std::uintmax_t>(1);
     }
 
     std::chrono::steady_clock::time_point end_time_point(std::chrono::steady_clock::now());
@@ -637,7 +637,7 @@ void reverse_iterator_traverse_benchmark(const std::uintmax_t source_value_count
         iterator!=system_tree_vector.rend();
         ++iterator)
     {
-        (*iterator)*=static_cast<std::uintmax_t>(2);
+        (*iterator)<<=static_cast<std::uintmax_t>(1);
     }
 
     end_time_point=std::chrono::steady_clock::now();
@@ -739,7 +739,7 @@ void insert_benchmark(const std::uintmax_t source_value_count)
     std::cout<<"Starting insert benchmark...\n";
 
     std::random_device device;
-    std::mt19937 engine(device());
+    std::default_random_engine engine(device());
     std::uniform_int_distribution<std::size_t> distribution;
 
     std::cout<<"Inserting std::vector<std::uintmax_t>()...\n";
@@ -799,7 +799,7 @@ void emplace_benchmark(const std::uintmax_t source_value_count)
     std::cout<<"Starting emplace benchmark...\n";
 
     std::random_device device;
-    std::mt19937 engine(device());
+    std::default_random_engine engine(device());
     std::uniform_int_distribution<std::size_t> distribution;
 
     std::cout<<"Emplacing std::vector<std::uintmax_t>()...\n";
@@ -908,7 +908,7 @@ void erase_benchmark(const std::uintmax_t source_value_count)
     std::cout<<"Starting erase benchmark...\n";
 
     std::random_device device;
-    std::mt19937 engine(device());
+    std::default_random_engine engine(device());
     std::uniform_int_distribution<std::size_t> distribution;
 
     std::cout<<"Constructing std::vector<std::uintmax_t>() with "
@@ -1152,7 +1152,7 @@ void greater_equal_comparison_benchmark(const std::uintmax_t source_value_count)
              <<source_value_count
              <<" value(s)...\n";
     const tree_vector<std::uintmax_t> source_tree_vector(static_cast<std::size_t>(source_value_count));
-    const tree_vector<std::uintmax_t> system_tree_vector(source_tree_vector);
+    const tree_vector<std::uintmax_t> system_tree_vector(static_cast<std::size_t>(source_value_count));
 
     std::cout<<"Greater equal comparing tree_vector<std::uintmax_t>()...\n";
     start_time_point=std::chrono::steady_clock::now();
